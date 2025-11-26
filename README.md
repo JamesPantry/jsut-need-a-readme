@@ -10,8 +10,7 @@
 - Left maintenance unchanged.
 
 ### SSH Access
-- All operational users authenticate using SSH keys.
-- `.ssh` directories set to **700** and `authorized_keys` files set to **600**, owned by each user.
+- All users can login with the given ssh keys from the sdi-client.
 - `design` and `marketing` have normal shell access.
 - `audit` is restricted to SFTP-only.
 
