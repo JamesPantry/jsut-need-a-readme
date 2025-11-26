@@ -5,24 +5,24 @@
 ## Configuration Implemented
 
 ### User Accounts
-- Created users: marketing, design, and audit.
-- Removed the sysadmin account and its home directory.
-- Left maintenance unchanged.
+- Created users: **marketing**, **design**, and **audit**.
+- Removed the **sysadmin** account and its home directory.
+- Left the **maintenance** account unchanged.
 
 ### SSH Access
-- All users can gain access to the system with the given ssh key from the sdi-client.
-- `design` and `marketing` have normal shell access.
-- `audit` is restricted to SFTP-only.
+- All operational accounts use SSH key authentication with the keys provided by the SDI-client.
+- `marketing` and `design` have normal shell access.
+- `audit` is restricted to SFTP-only and cannot obtain a login shell.
 
 ### Permissions and Access Control
-- ACLs have been used to help manage permissions specified in the ACW:
+- ACLs were used to implement the access rules specified in the ACW:
   - **audit** has read-only access to `/home/marketing`, `/home/design`, and `/srv/www`.
   - **marketing** has write access to `/srv/www` for website uploads.
-  - **design** has write access only within `/home/design`.
-- Ensures separation of roles and prevents unauthorized access.
+  - **design** can write only within `/home/design`.
+- This ensures correct separation of roles and prevents unauthorised access between accounts.
 
 ### SFTP Configuration
-The following SSH match block restricts the audit account to SFTP only:
+The following SSH match block enforces SFTP-only access for the audit user:
 
 ```
 Match User audit
@@ -32,7 +32,7 @@ Match User audit
 ```
 
 ### Design Directory Structure
-For `design`, required directories were created under `/home/design`:
+The required directory structure for the design account was created:
 
 ```
 project_rocket/cad
@@ -48,22 +48,21 @@ project_cheese/tests
 - Nginx installed and configured to serve static files on port **80**.
 - Web root set to `/srv/www`.
 - Created `/srv/www/student/index.txt` containing the required student number: `664398`.
-
-
-- Accessible at: `http://stu-664398-vm1.net.dcs.hull.ac.uk/student/` with `text/plain` MIME type.
-- The default site is served for both:
-  - The VM IP address
+- The file is accessible via:  
+  `http://stu-664398-vm1.net.dcs.hull.ac.uk/student/` with MIME type `text/plain`.
+- The default static site is served for:
+  - The VM’s IP address
   - `stu-664398-vm1.net.dcs.hull.ac.uk`
 
 ---
 
 ## Docker Application and Reverse Proxy
 
-- The SDI application from `sbrl/SDI-Docker` was built into the image **sdi-app**.
-- A container named **sdi-app** runs the service on port **3000** internally.
-- Restart policy set to `unless-stopped` to ensure automatic start on boot.
+- Built the SDI application from `sbrl/SDI-Docker` into the image **sdi-app**.
+- A container named **sdi-app** runs internally on port **3000**.
+- Restart policy set to `unless-stopped` so the service starts automatically on boot.
 - Nginx reverse proxy configuration:
-  - **Static site** for VM IP and `stu-664398-vm1.net.dcs.hull.ac.uk`
+  - **Static site** served for the VM IP and main domain.
   - **Docker application** served via `docker.stu-664398-vm1.net.dcs.hull.ac.uk` and proxied to `http://172.20.0.10:3000`.
 
 ---
@@ -71,8 +70,8 @@ project_cheese/tests
 ## Firewall
 
 - UFW enabled.
-- Allowed: **22/tcp** (SSH), **80/tcp** (HTTP).
-- Denied and allowed different ports as specified from Lab 3.
+- Allowed ports: **22/tcp** (SSH), **80/tcp** (HTTP).
+- Additional allow/deny rules applied as configured during Lab 3.
 
 ---
 
@@ -83,10 +82,10 @@ project_cheese/tests
 sudo apt update
 sudo apt upgrade
 ```
+
 ### SDI-Client
 ```
 sudo sdi-client update
-
 ```
 
 ### Service Management
@@ -106,11 +105,11 @@ sudo sdi-client update
 
 ### User Operations
 - **Marketing** uploads website content to `/srv/www`.
-- **Design** works solely within `/home/design`.
-- **Audit** performs read only SFTP checks.
+- **Design** works exclusively within `/home/design`.
+- **Audit** performs read-only SFTP checks.
 
 ### File Permissions
-- Adjust ACLs when necessary using `setfacl`.
-- Kept `/srv/www` owned by root to prevent unauthorised modifications.
+- Adjust ACLs when needed using `setfacl`.
+- `/srv/www` remains owned by root to prevent unauthorised changes.
 
 ---
