@@ -10,13 +10,12 @@
 - Left maintenance unchanged.
 
 ### SSH Access
-- All users can login with the given ssh keys from the sdi-client.
+- All users can gain access to the system with the given ssh key from the sdi-client.
 - `design` and `marketing` have normal shell access.
 - `audit` is restricted to SFTP-only.
 
 ### Permissions and Access Control
-- User home directories are private by default.
-- ACLs applied to meet the specification:
+- ACLs have been used to help manage permissions specified in the ACW:
   - **audit** has read-only access to `/home/marketing`, `/home/design`, and `/srv/www`.
   - **marketing** has write access to `/srv/www` for website uploads.
   - **design** has write access only within `/home/design`.
@@ -33,7 +32,7 @@ Match User audit
 ```
 
 ### Design Directory Structure
-The required directories were created under `/home/design`:
+For `design`, required directories were created under `/home/design`:
 
 ```
 project_rocket/cad
@@ -47,12 +46,11 @@ project_cheese/tests
 ## Web Server
 
 - Nginx installed and configured to serve static files on port **80**.
-- Web root set to **/srv/www**.
+- Web root set to `/srv/www`.
 - Created `/srv/www/student/index.txt` containing the required student number:
 
-```
-664398
-```
+  `664398`
+
 
 - Accessible at: `http://<VM_IP>/student/` with `text/plain` MIME type.
 - The default site is served for both:
