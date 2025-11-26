@@ -80,7 +80,13 @@ project_cheese/tests
 
 ### System Updates
 ```
-sudo apt update && sudo apt upgrade
+sudo apt update
+sudo apt upgrade
+```
+### SDI-Client
+```
+sudo sdi-client update
+
 ```
 
 ### Service Management
@@ -101,11 +107,10 @@ sudo apt update && sudo apt upgrade
 ### User Operations
 - **Marketing** uploads website content to `/srv/www`.
 - **Design** works solely within `/home/design`.
-- **Audit** performs read-only SFTP checks.
+- **Audit** performs read only SFTP checks.
 
 ### File Permissions
 - Adjust ACLs when necessary using `setfacl`.
-- Keep `/srv/www` owned by root to prevent unauthorized modifications.
+- Kept `/srv/www` owned by root to prevent unauthorised modifications.
 
----
 ---
