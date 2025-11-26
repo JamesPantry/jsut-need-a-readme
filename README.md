@@ -47,12 +47,10 @@ project_cheese/tests
 
 - Nginx installed and configured to serve static files on port **80**.
 - Web root set to `/srv/www`.
-- Created `/srv/www/student/index.txt` containing the required student number:
-
-  `664398`
+- Created `/srv/www/student/index.txt` containing the required student number: `664398`.
 
 
-- Accessible at: `http://<VM_IP>/student/` with `text/plain` MIME type.
+- Accessible at: `http://stu-664398-vm1.net.dcs.hull.ac.uk/student/` with `text/plain` MIME type.
 - The default site is served for both:
   - The VM IP address
   - `stu-664398-vm1.net.dcs.hull.ac.uk`
@@ -74,7 +72,7 @@ project_cheese/tests
 
 - UFW enabled.
 - Allowed: **22/tcp** (SSH), **80/tcp** (HTTP).
-- Denied unused or unnecessary ports to harden the system.
+- Denied and allowed different ports as specified from Lab 3.
 
 ---
 
@@ -110,10 +108,4 @@ sudo apt update && sudo apt upgrade
 - Keep `/srv/www` owned by root to prevent unauthorized modifications.
 
 ---
-
-## Additional Notes
-- Do not modify the `maintenance` account or disable its access.
-- Keep the audit ACL rules in place to maintain compliance.
-- The Docker container remains internal; external access is through Nginx.
-
 ---
