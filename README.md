@@ -1,5 +1,3 @@
-# README.md
-
 **Student Number:** **664398**
 
 ---
