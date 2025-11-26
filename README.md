@@ -5,9 +5,9 @@
 ## Configuration Implemented
 
 ### User Accounts
-- Created users: marketing, design, and **audit*.
-- Removed the legacy **sysadmin** account and its home directory.
-- Retained **ubuntu** and **maintenance** accounts unchanged.
+- Created users: marketing, design, and audit.
+- Removed the sysadmin account and its home directory.
+- Left maintenance unchanged.
 
 ### SSH Access
 - All operational users authenticate using SSH keys.
