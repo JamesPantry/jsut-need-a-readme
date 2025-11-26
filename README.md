@@ -5,7 +5,7 @@
 ## Configuration Implemented
 
 ### User Accounts
-- Created required users: **marketing**, **design**, and **audit**.
+- Created users: marketing, design, and **audit*.
 - Removed the legacy **sysadmin** account and its home directory.
 - Retained **ubuntu** and **maintenance** accounts unchanged.
 
