@@ -68,4 +68,57 @@ project_cheese/tests
 
 - The SDI application from `sbrl/SDI-Docker` was built into the image **sdi-app**.
 - A container named **sdi-app** runs the service on port **3000** internally.
-- R
+- Restart policy set to `unless-stopped` to ensure automatic start on boot.
+- Nginx reverse proxy configuration:
+  - **Static site** for VM IP and `stu-664398-vm1.net.dcs.hull.ac.uk`
+  - **Docker application** served via `docker.stu-664398-vm1.net.dcs.hull.ac.uk` and proxied to `http://172.20.0.10:3000`.
+
+---
+
+## Firewall
+
+- UFW enabled.
+- Allowed: **22/tcp** (SSH), **80/tcp** (HTTP).
+- Denied unused or unnecessary ports to harden the system.
+
+---
+
+## Common Maintenance Tasks
+
+### System Updates
+```
+sudo apt update && sudo apt upgrade
+```
+
+### Service Management
+- Restart Nginx:
+  ```
+  sudo systemctl restart nginx
+  ```
+- Restart Docker:
+  ```
+  sudo systemctl restart docker
+  ```
+- Check Docker status:
+  ```
+  sudo docker ps
+  sudo docker logs sdi-app
+  ```
+
+### User Operations
+- **Marketing** uploads website content to `/srv/www`.
+- **Design** works solely within `/home/design`.
+- **Audit** performs read-only SFTP checks.
+
+### File Permissions
+- Adjust ACLs when necessary using `setfacl`.
+- Keep `/srv/www` owned by root to prevent unauthorized modifications.
+
+---
+
+## Additional Notes
+- Do not modify the `maintenance` account or disable its access.
+- Keep the audit ACL rules in place to maintain compliance.
+- The Docker container remains internal; external access is through Nginx.
+
+---
