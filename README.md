@@ -1,115 +1,138 @@
-**Student Number:** **664398**
+# Heating Controller – README
+
+## Project Overview
+This project implements a smart heating controller on the **PIC18F45K22** using the EasyPIC7A development board.  
+It provides:
+
+- Temperature measurement using an LM35 sensor  
+- Time-based heating control using an external RTC  
+- LCD menu interface with button navigation  
+- Alarm system with selectable tones and buzzer playback  
+- Persistent configuration stored in EEPROM  
+- Fully non-blocking, modular software architecture  
 
 ---
 
-## Configuration Implemented
+## 1. Building the Project
 
-### User Accounts
-- Created users: **marketing**, **design**, and **audit**.
-- Removed the **sysadmin** account and its home directory.
-- Left the **maintenance** account unchanged.
-
-### SSH Access
-- All users can use SSH key authentication with the keys provided by the SDI-client.
-- `marketing` and `design` have normal shell access.
-- `audit` is restricted to SFTP-only and cannot obtain a login shell.
-
-### Permissions and Access Control
-- ACLs were used to implement the access rules specified in the ACW:
-  - **audit** has read-only access to `/home/marketing`, `/home/design`, and `/srv/www`.
-  - **marketing** has write access to `/srv/www` for website uploads.
-  - **design** can write only within `/home/design`.
-- This prevents unauthorised access between accounts.
-
-### SFTP Configuration
-The following SSH match block enforces SFTP-only access for the audit user:
-
-```
-Match User audit
-    ForceCommand internal-sftp
-    PermitTTY no
-    AllowTcpForwarding no
-```
-
-### Design Directory Structure
-The required directory structure for the design account was created:
-
-```
-project_rocket/cad
-project_rocket/render
-project_cheese/research
-project_cheese/tests
-```
+1. Open **MPLAB X IDE**  
+2. Go to **File → Open Project…**  
+3. Select the folder containing the project `.X` directory  
+4. Click **Build Project** (hammer icon)
 
 ---
 
-## Web Server
+## 2. Running the Project on the Board
 
-- Nginx installed and configured to serve static files on port **80**.
-- Web root set to `/srv/www`.
-- Created `/srv/www/student/index.txt` containing the required student number: `664398`.
-- The file is accessible at:  
-  `http://stu-664398-vm1.net.dcs.hull.ac.uk/student/` with MIME type `text/plain`.
-- The default static site is served for:
-  - `stu-664398-vm1.net.dcs.hull.ac.uk`
+1. Connect the EasyPIC7A to your PC using USB  
+2. Open **CodeGrip** and verify that the board is detected  
+3. Return to **MPLAB X IDE**, select the board as the programmer/debug tool  
+4. Click **Run** (green arrow) to flash and start the program  
 
 ---
 
-## Docker Application and Reverse Proxy
+## 3. Hardware Connections
 
-- Built the SDI application from `sbrl/SDI-Docker` into the image **sdi-app**.
-- A container named **sdi-app** runs internally on port **3000**.
-- Restart policy set to `unless-stopped` so the service starts automatically on boot.
-- Nginx reverse proxy configuration:
-  - **Docker application** served via `docker.stu-664398-vm1.net.dcs.hull.ac.uk` and proxied to `http://172.20.0.10:3000`.
-
----
-
-## Firewall
-
-- UFW enabled.
-- Allowed ports: **22/tcp** (SSH), **80/tcp** (HTTP).
-- Additional allow/deny rules applied as configured during Lab 3.
+| Component | PIC Pin(s) | Description |
+|----------|------------|-------------|
+| **LM35 Temperature Sensor** | AN6 / RE1 | Analogue input → ADC |
+| **RTC (I²C)** | RC3 (SCL), RC4 (SDA) | Timekeeping interface |
+| **Buttons** | RC6 (UP), RC7 (DOWN), RC0 (SELECT), RC1 (BACK) | Debounced digital inputs |
+| **7-Segment Display** | PORTD | Multiplexed display |
+| **LCD 16×2** | PORTB | Menus + system state |
+| **Heating LED** | RE0 | Indicates heating ON/OFF |
+| **Buzzer** | RC2 | PWM tone / melody output |
 
 ---
 
-## Common Maintenance Tasks
+## 4. System Startup Behaviour
 
-### System Updates
-```
-sudo apt update
-sudo apt upgrade
-```
-
-### SDI-Client
-```
-sudo sdi-client update
-```
-### Service Status Checks
-
-- Check Nginx status:
-  ```
-  systemctl status nginx
-  ```
-
-- Check Docker service status:
-  ```
-  systemctl status docker
-  ```
-
-### Service Management
-- Restart Nginx:
-  ```
-  sudo systemctl restart nginx
-  ```
-- Restart Docker:
-  ```
-  sudo systemctl restart docker
-  ```
-- Check Docker status:
-  ```
-  sudo docker ps
-  sudo docker logs sdi-app
-  ```
+- Configuration values are loaded from EEPROM  
+  - If invalid or first run → defaults are written  
+- UI initialises and the **home screen** appears  
+- Seven-segment display begins showing **temperature ×100**  
+- LM35 sampling, RTC reading, heating logic, and buzzer engine all start automatically  
 
 ---
+
+## 5. Button Controls
+
+| Button | PIC Pin | Function |
+|--------|---------|----------|
+| **SELECT** | RC0 | Confirm / next menu item |
+| **BACK** | RC1 | Cancel / go back / silence alarm |
+| **UP** | RC6 | Increase value / scroll up |
+| **DOWN** | RC7 | Decrease value / scroll down |
+
+---
+
+## 6. Using the System
+
+### **Home Screen (LCD)**
+- **Line 1:** Temperature (e.g., `Temp: 22.34C`)  
+- **Line 2:** Heating status (ON/OFF) and current time  
+- **Shortcut:** Press **DOWN** on the home screen to quickly toggle the alarm ON/OFF  
+
+### **Menu Options**
+- **Temp Limits**  
+  Set heating low and high thresholds  
+- **Heating Window**  
+  Configure allowed heating start/end time  
+- **Alarm Settings**  
+  Set alarm hour/minute, enable, tone  
+- **Exit**  
+  Return to home screen  
+
+### **Configurable Settings**
+- Temperature low/high limits  
+- Heating window start/end  
+- Alarm hour and minute  
+- Alarm enable/disable  
+- Alarm tone  
+
+All settings are saved automatically to EEPROM.
+
+---
+
+## 7. Heating Behaviour
+
+Heating turns **ON** when:
+- The current time is within the configured heating window, and  
+- The measured temperature is **≤ low limit**
+
+Heating turns **OFF** when:
+- The measured temperature is **≥ high limit**, or  
+- The system is **outside** the heating window
+
+Heating state is displayed on:
+- The **LCD**  
+- The **RE0 LED**
+
+---
+
+## 8. Alarm and Buzzer
+
+- When RTC time matches the **alarm hour** and **minute**, the system plays the selected tone or melody  
+- Buzzer playback is fully **non-blocking**, allowing the UI and heating control to continue working  
+- Press **BACK** at any time to silence the alarm  
+- Alarm settings (enabled state + tone) are stored in EEPROM  
+
+---
+
+## 9. File Structure
+
+```text
+Project/
+│
+├── README.md
+├── main.c
+├── lm35.c / lm35.h
+├── rtc16.c / rtc16.h
+├── buttons.c / buttons.h
+├── lcd.c / lcd.h
+├── sevenseg.c / sevenseg.h
+├── heating.c / heating.h
+├── alarm.c / alarm.h
+├── buzzer.c / buzzer.h
+├── eeprom_cfg.c / eeprom_cfg.h
+└── ui.c / ui.h
